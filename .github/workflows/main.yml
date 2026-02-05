@@ -3,6 +3,9 @@ name: Initial Setup
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   setup:
     runs-on: ubuntu-latest
@@ -17,11 +20,14 @@ jobs:
           echo "# main entry point" > src/main.py
           touch requirements.txt
 
-      - name: Commit changes
+      - name: Commit changes if any
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
           git add .
-          git commit -m "Initial project structure"
-          git push
-
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Initial project structure"
+            git push
+          fi
