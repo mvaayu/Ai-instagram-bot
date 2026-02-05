@@ -1,10 +1,14 @@
-import os
 import yfinance as yf
 from openai import OpenAI
+from moviepy.editor import ImageClip
+from PIL import Image, ImageDraw, ImageFont
 
 client = OpenAI()
 
 
+# -------------------------
+# Fetch market data
+# -------------------------
 def fetch_market_data():
     nifty = yf.Ticker("^NSEI")
     data = nifty.history(period="1d")
@@ -18,19 +22,16 @@ def fetch_market_data():
     return close, change, percent
 
 
+# -------------------------
+# Generate caption
+# -------------------------
 def generate_caption(close, change, percent):
     prompt = f"""
-    Create a short Instagram caption.
+    Create a short Instagram reel caption.
+    Neutral tone. No advice.
+    Max 4 lines. Add emojis.
 
-    Rules:
-    - Only facts
-    - No stock advice
-    - Neutral tone
-    - Max 3 lines
-    - Add emojis
-
-    Data:
-    NIFTY close {close}
+    Close {close}
     Change {change} ({percent}%)
     """
 
@@ -42,6 +43,29 @@ def generate_caption(close, change, percent):
     return res.choices[0].message.content
 
 
+# -------------------------
+# Create reel video
+# -------------------------
+def create_video(text):
+
+    W, H = 1080, 1920
+
+    img = Image.new("RGB", (W, H), (15, 18, 25))
+    draw = ImageDraw.Draw(img)
+
+    font = ImageFont.load_default()
+
+    draw.text((80, 800), text, fill="white", font=font)
+
+    img.save("frame.png")
+
+    clip = ImageClip("frame.png").set_duration(10)
+    clip.write_videofile("output.mp4", fps=24)
+
+
+# -------------------------
+# Main
+# -------------------------
 def main():
     print("🚀 Bot started")
 
@@ -49,8 +73,11 @@ def main():
 
     caption = generate_caption(close, change, percent)
 
-    print("\n📢 Generated Caption:\n")
-    print(caption)
+    print("\nCaption:\n", caption)
+
+    create_video(caption)
+
+    print("🎬 Video created successfully: output.mp4")
 
 
 if __name__ == "__main__":
