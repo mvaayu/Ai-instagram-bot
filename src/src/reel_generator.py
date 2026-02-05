@@ -1,41 +1,59 @@
-from PIL import Image, ImageDraw, ImageFont
-from moviepy.editor import ImageClip, concatenate_videoclips
+import yfinance as yf
+import matplotlib.pyplot as plt
+from moviepy.editor import ImageClip, TextClip, CompositeVideoClip
+from datetime import datetime
+import os
 
-WIDTH, HEIGHT = 1080, 1920
-BG_COLOR = (0, 0, 0)
-TEXT_COLOR = (255, 255, 255)
-DURATION_PER_SLIDE = 2
+OUTPUT_DIR = "output"
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-lines = [
-    "NIFTY 50 – Market Recap",
-    "Previous Close: 21,982",
-    "+0.63% Today",
-    "Volatility remained moderate"
-]
+def fetch_data():
+    nifty = yf.download("^NSEI", period="1mo", interval="1d")
+    return nifty
 
-clips = []
+def create_chart(data):
+    plt.figure(figsize=(6,4))
+    plt.plot(data.index, data["Close"])
+    plt.title("NIFTY 50 – Last 1 Month")
+    plt.tight_layout()
+    path = f"{OUTPUT_DIR}/chart.png"
+    plt.savefig(path)
+    plt.close()
+    return path
 
-for line in lines:
-    img = Image.new("RGB", (WIDTH, HEIGHT), BG_COLOR)
-    draw = ImageDraw.Draw(img)
+def create_reel(chart_path):
+    img_clip = ImageClip(chart_path).set_duration(6)
 
-    # Default font (safe on GitHub Actions)
-    font = ImageFont.load_default()
+    text = TextClip(
+        "Market Snapshot\n(No Advice)",
+        fontsize=50,
+        color="white",
+        size=img_clip.size,
+        method="caption",
+        align="center"
+    ).set_duration(6)
 
-    text_bbox = draw.textbbox((0, 0), line, font=font)
-    text_width = text_bbox[2] - text_bbox[0]
-    text_height = text_bbox[3] - text_bbox[1]
+    video = CompositeVideoClip([img_clip, text])
+    video_path = f"{OUTPUT_DIR}/reel.mp4"
+    video.write_videofile(video_path, fps=24)
+    return video_path
 
-    x = (WIDTH - text_width) / 2
-    y = (HEIGHT - text_height) / 2
+def generate_caption():
+    today = datetime.now().strftime("%d %b %Y")
+    return (
+        f"Market recap | {today}\n\n"
+        "Data-driven snapshot of NIFTY 50.\n"
+        "Purely historical. No recommendations.\n\n"
+        "#stockmarket #nifty50 #marketdata #investingfacts"
+    )
 
-    draw.text((x, y), line, fill=TEXT_COLOR, font=font)
+def generate():
+    data = fetch_data()
+    chart = create_chart(data)
+    video = create_reel(chart)
+    caption = generate_caption()
 
-    img_path = f"frame_{len(clips)}.png"
-    img.save(img_path)
+    with open("output/caption.txt", "w") as f:
+        f.write(caption)
 
-    clip = ImageClip(img_path).set_duration(DURATION_PER_SLIDE)
-    clips.append(clip)
-
-final_video = concatenate_videoclips(clips, method="compose")
-final_video.write_videofile("reel.mp4", fps=24)
+    print("✅ Reel generated successfully")
