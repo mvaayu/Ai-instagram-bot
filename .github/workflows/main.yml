@@ -1,28 +1,25 @@
-name: Run Market Data Script
+name: Daily Market Reel Bot
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 3 * * 1-5"   # Runs at 9:00 AM IST (Mon–Fri)
+    - cron: "30 10 * * 1-5"   # Market days IST
 
 jobs:
   run-script:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
-      - name: Run market data script
-        run: |
-          python -m src.main
+      - name: Run market reel script
+        run: python -m src.main
