@@ -1,4 +1,0 @@
-yfinance
-moviepy
-pillow
-matplotlib
