@@ -17,10 +17,14 @@ jobs:
           echo "# main entry point" > src/main.py
           touch requirements.txt
 
-      - name: Commit changes
+      - name: Commit changes (only if needed)
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           git add .
-          git commit -m "Initial project structure"
-          git push
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Initial project structure"
+            git push
+          fi
