@@ -18,4 +18,6 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run bot
-        run: python main.py
+  env:
+    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  run: python main.py
