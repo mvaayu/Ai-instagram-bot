@@ -3,18 +3,16 @@ name: Instagram AI Bot
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 13 * * 1-5"   # 7PM IST weekdays
+    - cron: "30 13 * * 1-5"
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
@@ -22,6 +20,6 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run bot
-  env:
-    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  run: python main.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python main.py
