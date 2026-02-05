@@ -4,7 +4,7 @@ from openai import OpenAI
 from moviepy.editor import ImageClip
 from PIL import Image, ImageDraw, ImageFont
 
-client = OpenAI(api_key=os.getenv("OPENAI_KEY"))
+client = OpenAI()
 
 
 # -------------------------
