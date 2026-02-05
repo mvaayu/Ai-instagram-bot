@@ -1,12 +1,12 @@
-name: Daily Market Reel Bot
+name: Instagram AI Bot
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 10 * * 1-5"   # Market days IST
+    - cron: "30 13 * * 1-5"   # 7PM IST weekdays
 
 jobs:
-  run-script:
+  run-bot:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,10 +16,10 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.11"
 
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run market reel script
-        run: python -m src.main
+      - name: Run bot
+        run: python main.py
