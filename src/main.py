@@ -1,5 +1,5 @@
-print("Starting reel generation...")
+import reel_generator
 
-from src import reel_generator
-
-print("Reel generation completed.")
+if __name__ == "__main__":
+    print("🚀 Starting automated market reel generation")
+    reel_generator.generate()
