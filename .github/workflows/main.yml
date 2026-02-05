@@ -1,4 +1,4 @@
-name: Initial Setup
+name: Run Market Data Script
 
 on:
   workflow_dispatch:
@@ -7,27 +7,23 @@ permissions:
   contents: write
 
 jobs:
-  setup:
+  run-script:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create folders and files
-        run: |
-          mkdir -p src data media scripts
-          echo "# main entry point" > src/main.py
-          touch requirements.txt
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-      - name: Commit changes if any
+      - name: Install dependencies
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add .
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Initial project structure"
-            git push
-          fi
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run market data script
+        run: |
+          python src/main.py
