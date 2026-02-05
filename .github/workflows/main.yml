@@ -1,9 +1,7 @@
-name: Instagram AI Bot
+name: Bot Runner
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "30 13 * * 1-5"
 
 jobs:
   run-bot:
@@ -16,10 +14,5 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
       - name: Run bot
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python main.py
