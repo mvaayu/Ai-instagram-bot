@@ -1,5 +1,6 @@
 yfinance
 pandas
 openai
-moviepy
+moviepy==1.0.3
 Pillow
+imageio-ffmpeg
